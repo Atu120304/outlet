@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Electricity Usage Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            background: linear-gradient(120deg, #e0f7fa, #e1bee7);
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 700px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        label {
+            margin-top: 15px;
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 10px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .result, .table-section {
+            margin-top: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .success-message {
+            color: green;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Electricity Usage Tracker</h2>
+
+        {% if message %}
+            <p class="error-message">{{ message }}</p>
+        {% endif %}
+
+        {% if daily_total %}
+            <p class="success-message">Daily total cost: £{{ daily_total }}</p>
+        {% endif %}
+
+        <form method="POST">
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" value="{{ current_date }}" required>
+
+            <label for="reading">Electricity Reading (kWh):</label>
+            <input type="number" id="reading" name="reading" step="0.01" required>
+
+            <label for="unit_price">Unit Price (per kWh):</label>
+            <input type="number" id="unit_price" name="unit_price" step="0.0001" value="0.34" required>
+
+            <label for="standing_charge">Standing Charge (£):</label>
+            <input type="number" id="standing_charge" name="standing_charge" step="0.01" value="0.53" required>
+
+            <button type="submit">Submit Reading</button>
+        </form>
+
+        <div class="table-section">
+            <h4>Past Records</h4>
+            {% if records %}
+               <form method="GET" action="/download">
+                    <button type="submit">Download as CSV</button>
+               </form>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Reading (kWh)</th>
+                            <th>Usage (kWh)</th>
+                            <th>Unit Price</th>
+                            <th>Standing Charge</th>
+                            <th>Total Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in records %}
+                        <tr>
+                            <td>{{ r.date }}</td>
+                            <td>{{ r.reading }}</td>
+                            <td>{{ r.usage }}</td>
+                            <td>£{{ r.unit_price }}</td>
+                            <td>£{{ r.standing_charge }}</td>
+                            <td>£{{ r.total_cost }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No records found yet.</p>
+            {% endif %}
+            
+        </div>
+        <a href="/" style="text-decoration: none;">
+                <button type="button" style="background-color: #2196F3;"> Back</button>
+        </a>
+    </div>
+</body>
+</html>
