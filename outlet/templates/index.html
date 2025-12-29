@@ -7,8 +7,8 @@
         body {
             font-family: 'Segoe UI', sans-serif;
             margin: 0;
-            padding: 0;
-            background-color: #f4f6f8;
+            padding: 40;
+            background-color: linear-gradient(120deg, #e0f7fa, #e1bee7);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -104,7 +104,7 @@
 
 <header>
   <center>
-    <div class="logo-title">Welcome to Your Dashboard</div>
+    <div class="logo-title ">   🏠 Dashboard </div>
   </center>
     
     <div class="nav-buttons">
@@ -120,12 +120,12 @@
 </header>
 
 <div class="welcome-section">
-    <h2>Welcome to the All-in-One Utility App</h2>
+    <h2> Welcome to the All-in-One Utility App</h2>
     <p>
-        This platform helps you manage multiple personal tools in one place — from electricity usage tracking, smart notetaking, to real-time messaging.
+        Personalised website
     </p>
     <p>
-        Customize your experience, store your data securely, and track activities like meter readings or messages — all designed for simplicity and privacy.
+        All copy rites belongs to Ramensite.
     </p>
     {% if not session.user %}
     <p style="color: red; font-weight: bold;">
@@ -140,7 +140,7 @@
         <div><strong>Electricity Calculator</strong></div>
         <div style="font-size: 0.9em; margin-top: 8px;">Estimate usage and cost</div>
     </a>
-
+<!--
     <a href="/notepad" class="app-card {% if not session.user %}disabled{% endif %}">
         <div class="app-icon">📝</div>
         <div><strong>Notepad</strong></div>
@@ -152,13 +152,14 @@
         <div><strong>Message Center</strong></div>
         <div style="font-size: 0.9em; margin-top: 8px;">Chat with internal users</div>
     </a>
-
-    <a href="/videochat" class="app-card {% if not session.user %}disabled{% endif %}">
-        <div class="app-icon">VC</div>
-        <div><strong>Video chat</strong></div>
+-->  
+    <a href="/videochat-lobby" class="app-card {% if not session.user %}disabled{% endif %}">
+        <div class="app-icon">📹</div>
+        <div><strong>Video Chat</strong></div>
         <div style="font-size: 0.9em; margin-top: 8px;">Video call</div>
     </a>
-    
+
+
 </div>
 
 <footer>
