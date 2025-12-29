@@ -283,6 +283,7 @@ def messages():
 def videochat_lobby():
     if 'user' not in session:
         return redirect(url_for('login'))
+    print(os.listdir('templates'))
 
     return render_template(
         'videochat_lobby.html',
