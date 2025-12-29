@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video Call Lobby</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(120deg, #e3f2fd, #ede7f6);
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        .room {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 5px;
+            background: #4CAF50;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .create-btn {
+            width: 100%;
+            margin-bottom: 20px;
+            background: #2196F3;
+        }
+
+        .back {
+            margin-top: 20px;
+            display: block;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h2>Video Call Lobby</h2>
+
+    <p>Welcome, {{ current_user }} Create a room or join avaiable rooms</p>
+
+    <!-- Create Room -->
+    <form method="POST" action="/videochat/create">
+        <input type="text" name="room_name" placeholder="Enter Room Name" required />
+        <button type="submit">➕ Create New Room</button>
+    </form>
+    
+    <h3>Waiting Rooms</h3>
+
+    {% if rooms %}
+        {% for room in rooms %}
+            <div class="room">
+                <span>Room: <strong>{{ room }}</strong></span>
+                <a href="/videochat/room/{{ room }}">
+                    <button>Join</button>
+                </a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No active rooms. Create one!</p>
+    {% endif %}
+
+    <a href="/" class="back"> ⬅ Back </a>
+    
+  
+</div>
+
+</body>
+</html>
