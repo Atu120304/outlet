@@ -5,12 +5,18 @@ from datetime import datetime, date
 import secrets
 import smtplib
 from email.mime.text import MIMEText
+from flask_socketio import SocketIO, join_room, leave_room, emit
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "your_secret_key")
+socketio = SocketIO(app, cors_allowed_origins="*")  # SocketIO for WebRTC signaling
+
 
 LOG_FILE = "user_activity.log"
 DB_FILE = "electricity.db"
+
+#  ADD THIS HERE (GLOBAL)
+video_rooms = {}
 
 # Database Initialization
 def init_db():
@@ -273,5 +279,106 @@ def messages():
         flash("Please login to access this page.")
         return redirect(url_for('login'))
 
+@app.route('/videochat-lobby')
+def videochat_lobby():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    return render_template(
+        'videochat_lobby.html',
+        current_user=session['user'],
+        rooms=video_rooms
+    )
+
+
+@app.route('/videochat/create', methods=['POST'])
+def create_video_room():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    username = session['user']
+    room_name = request.form.get('room_name', '').strip()  # <-- fetch from form
+
+    if not room_name:
+        flash("Room name is required!")
+        return redirect(url_for('videochat_lobby'))
+
+    if room_name in video_rooms:
+        flash("Room already exists!")
+        return redirect(url_for('videochat_lobby'))
+
+    # Create room
+    video_rooms[room_name] = {
+        "host": username,
+        "participants": [username]
+    }
+
+    return redirect(url_for('videochat_room', room_name=room_name))
+
+
+@app.route('/videochat/room/<room_name>')
+def videochat_room(room_name):
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    username = session['user']
+
+    if room_name not in video_rooms:
+        flash("Room no longer exists")
+        return redirect(url_for('videochat_lobby'))
+
+    if username not in video_rooms[room_name]['participants']:
+        video_rooms[room_name]['participants'].append(username)
+
+    return render_template(
+        'videochat.html',
+        username=username,
+        room=room_name
+    )
+
+
+    
+# ---------------- SocketIO events ----------------
+@socketio.on('join')
+def handle_join(room):
+    join_room(room)
+    user = session.get('user')
+
+    # notify host if a new participant joins
+    if room in video_rooms:
+        host = video_rooms[room]['host']
+        if host != user:
+            emit('new_participant', room=room, to=host)
+
+
+
+@socketio.on('offer')
+def handle_offer(data):
+    emit('offer', data, room=data['room'], include_self=False)
+
+@socketio.on('answer')
+def handle_answer(data):
+    emit('answer', data, room=data['room'], include_self=False)
+
+@socketio.on('ice_candidate')
+def handle_ice(data):
+    emit('ice_candidate', data, room=data['room'], include_self=False)
+
+@socketio.on('leave')
+def handle_leave(room):
+    leave_room(room)
+
+    user = session.get('user')
+    if room in video_rooms and user in video_rooms[room]['participants']:
+        video_rooms[room]['participants'].remove(user)
+
+        # delete room if empty
+        if not video_rooms[room]['participants']:
+            del video_rooms[room]
+
+    emit('user_left', room=room, broadcast=True)
+
+
+
 if __name__ == "__main__":
-     app.run(debug=True, host='0.0.0.0', port=5001)
+     app.run(debug=True)
