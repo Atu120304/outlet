@@ -379,6 +379,5 @@ def handle_leave(room):
     emit('user_left', room=room, broadcast=True)
 
 
-
 if __name__ == "__main__":
      app.run(debug=True)
